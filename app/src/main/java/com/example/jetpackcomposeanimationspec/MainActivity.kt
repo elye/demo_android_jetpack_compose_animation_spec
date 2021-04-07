@@ -14,11 +14,10 @@ import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Paint
-import androidx.compose.ui.graphics.Path
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.*
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
-import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -53,8 +52,8 @@ fun OverallPlotter(modifier: Modifier = Modifier) {
         )
     }
 
-    val upperBound = 1.8f
-    val lowerBound = -1.5f
+    val upperBound = 2f
+    val lowerBound = -1f
 
     val lowerBoundCeil = ceil(lowerBound).toInt()
     val upperBoundFloor = floor(upperBound).toInt()
@@ -76,28 +75,34 @@ fun OverallPlotter(modifier: Modifier = Modifier) {
     Canvas(modifier = Modifier.size(16.dp)) {
 
     }
-    Row (modifier.padding(16.dp)) {
+    Row(modifier.padding(16.dp)) {
         val penColor = MaterialTheme.colors.onBackground
         val boxPadding = 16.dp
-        Canvas(
+        Box(
             Modifier
+                .padding(0.dp, boxPadding, 0.dp, boxPadding)
                 .width(30.dp)
-                .fillMaxHeight()) {
-            val textSize = 16.sp.toPx()
-            val textPaint = Paint().asFrameworkPaint().apply {
-                this.textSize = textSize
-            }
-
-            drawIntoCanvas { canvas ->
-                (lowerBoundCeil..upperBoundFloor).forEach {
-                    canvas.nativeCanvas.drawText(
-                        it.toString(),
-                        15.dp.toPx(),
-                        size.height - boxPadding.toPx() + textSize/2
-                                - ((size.height - boxPadding.toPx() * 2))
-                                * (it - lowerBound) / (upperBound - lowerBound),
-                        textPaint
-                    )
+                .fillMaxHeight()
+        ) {
+            Canvas(
+                Modifier
+                    .fillMaxSize()
+            ) {
+                val textSize = 16.sp.toPx()
+                val textPaint = Paint().asFrameworkPaint().apply {
+                    this.textSize = textSize
+                }
+                drawIntoCanvas { canvas ->
+                    (lowerBoundCeil..upperBoundFloor).forEach {
+                        canvas.nativeCanvas.drawText(
+                            it.toString(),
+                            15.dp.toPx(),
+                            size.height + textSize / 2
+                                    - ((size.height))
+                                    * (it - lowerBound) / (upperBound - lowerBound),
+                            textPaint
+                        )
+                    }
                 }
             }
         }
@@ -105,9 +110,21 @@ fun OverallPlotter(modifier: Modifier = Modifier) {
             Modifier
                 .padding(0.dp, boxPadding, 0.dp, boxPadding)
                 .weight(4f)
-                .fillMaxHeight()) {
+                .fillMaxHeight()
+        ) {
             Canvas(Modifier.fillMaxSize()) {
                 drawRect(penColor, size = size, style = Stroke(1.dp.toPx()))
+
+                (lowerBoundCeil..upperBoundFloor).forEach {
+                    val yAxis = size.height -
+                            ((size.height)) * (it - lowerBound) / (upperBound - lowerBound)
+                    drawLine(
+                        penColor,
+                        Offset(0f, yAxis),
+                        Offset(size.width, yAxis),
+                        1.dp.toPx()
+                    )
+                }
             }
             PlotterView(
                 Modifier.fillMaxSize(),
@@ -122,20 +139,18 @@ fun OverallPlotter(modifier: Modifier = Modifier) {
 
 
 @Composable
-fun PlotterView(modifier: Modifier = Modifier,
-                xPoint: Float, yPoint: Float,
-                upperBound: Float, lowerBound: Float) {
+fun PlotterView(
+    modifier: Modifier = Modifier,
+    xPoint: Float, yPoint: Float,
+    upperBound: Float, lowerBound: Float
+) {
     val path by remember { mutableStateOf(Path()) }
-    val penColor = MaterialTheme.colors.onBackground
+    val penColor = Color.Red
 
     Canvas(modifier) {
-        if (path.isEmpty) {
-            path.moveTo(0f, size.height)
-        }
-        path.lineTo(
-            size.width * xPoint,
-            size.height * (1 - (yPoint - lowerBound) / (upperBound - lowerBound))
-        )
+        val yAxis = size.height * (1 - (yPoint - lowerBound) / (upperBound - lowerBound))
+        if (path.isEmpty) { path.moveTo(0f, yAxis) }
+        path.lineTo(size.width * xPoint, yAxis)
         drawPath(
             path,
             color = penColor,
