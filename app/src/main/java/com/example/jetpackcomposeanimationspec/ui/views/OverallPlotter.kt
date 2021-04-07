@@ -21,8 +21,8 @@ import kotlin.math.floor
 @Composable
 fun OverallPlotter(modifier: Modifier = Modifier, animationSpec: AnimationSpec<Float>) {
 
-    val animatableFloat = remember { Animatable(0f) }
-    val trackAnimatableFloat = remember { Animatable(0f) }
+    val animatableFloat = remember(animationSpec) { Animatable(0f) }
+    val trackAnimatableFloat = remember(animationSpec) { Animatable(0f) }
 
     LaunchedEffect(animatableFloat) {
         animatableFloat.animateTo(
@@ -113,7 +113,8 @@ fun OverallPlotter(modifier: Modifier = Modifier, animationSpec: AnimationSpec<F
                 xPoint = animatableFloat.value,
                 yPoint = trackAnimatableFloat.value,
                 upperBound = upperBound,
-                lowerBound = lowerBound
+                lowerBound = lowerBound,
+                animationSpec = animationSpec
             )
         }
     }
@@ -138,9 +139,10 @@ fun BallAnimator(
 fun PlotterView(
     modifier: Modifier = Modifier,
     xPoint: Float, yPoint: Float,
-    upperBound: Float, lowerBound: Float
+    upperBound: Float, lowerBound: Float,
+    animationSpec: AnimationSpec<Float>
 ) {
-    val path by remember { mutableStateOf(Path()) }
+    val path by remember(animationSpec) { mutableStateOf(Path()) }
     val penColor = Color.Red
 
     Canvas(modifier) {
