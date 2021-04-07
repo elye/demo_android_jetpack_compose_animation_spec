@@ -3,11 +3,9 @@ package com.example.jetpackcomposeanimationspec
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.animation.core.Animatable
-import androidx.compose.animation.core.LinearEasing
-import androidx.compose.animation.core.spring
-import androidx.compose.animation.core.tween
+import androidx.compose.animation.core.*
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
@@ -65,19 +63,29 @@ fun OverallPlotter(modifier: Modifier = Modifier) {
 //            animationSpec = keyframes {
 //                durationMillis = 5000
 //                0.0f at 0 with LinearOutSlowInEasing // for 0-15 ms
-//                0.4f at 1500 with FastOutLinearInEasing // for 15-75 ms
-//                0.8f at 3000 // ms
+//                -0.4f at 1500 with FastOutLinearInEasing // for 15-75 ms
+//                -0.8f at 3000 // ms
 //                0.95f at 4000 // ms
 //            }
         )
     }
 
-    Canvas(modifier = Modifier.size(16.dp)) {
-
-    }
     Row(modifier.padding(16.dp)) {
         val penColor = MaterialTheme.colors.onBackground
         val boxPadding = 16.dp
+        Box(
+            modifier = Modifier
+                .padding(0.dp, boxPadding, 0.dp, boxPadding)
+                .width(30.dp)
+                .fillMaxHeight()
+        ) {
+            BallAnimator(
+                Modifier.fillMaxSize(),
+                yPoint = trackAnimatableFloat.value,
+                upperBound = upperBound,
+                lowerBound = lowerBound
+            )
+        }
         Box(
             Modifier
                 .padding(0.dp, boxPadding, 0.dp, boxPadding)
@@ -137,6 +145,20 @@ fun OverallPlotter(modifier: Modifier = Modifier) {
     }
 }
 
+@Composable
+fun BallAnimator(
+    modifier: Modifier = Modifier,
+    yPoint: Float,
+    upperBound: Float, lowerBound: Float
+) {
+    val penColor = Color.Red
+
+    Canvas(modifier) {
+        val yAxis = size.height * (1 - (yPoint - lowerBound) / (upperBound - lowerBound))
+        val radius = 8.dp.toPx()
+        drawCircle(penColor, radius, Offset(15.dp.toPx(), yAxis))
+    }
+}
 
 @Composable
 fun PlotterView(
@@ -149,7 +171,9 @@ fun PlotterView(
 
     Canvas(modifier) {
         val yAxis = size.height * (1 - (yPoint - lowerBound) / (upperBound - lowerBound))
-        if (path.isEmpty) { path.moveTo(0f, yAxis) }
+        if (path.isEmpty) {
+            path.moveTo(0f, yAxis)
+        }
         path.lineTo(size.width * xPoint, yAxis)
         drawPath(
             path,
