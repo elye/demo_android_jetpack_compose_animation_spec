@@ -9,13 +9,13 @@ enum class AnimationSpecEnum(
     val upperBound: Float,
     val duration: Int
 ) {
-    SPRING("Spring",
+    SPRING("Spring 0.125 0.5",
         spring<Float>(0.125f, 5f),
         -0.2f, 1.8f, 20000),
-    SPRING_2("Spring 2",
+    SPRING_2("Spring 0.25 0.5",
         spring<Float>(0.25f, 5f),
         -0.2f, 1.8f, 20000),
-    KEYFRAME_1("Keyframe 1",
+    KEYFRAME_1("Keyframe Variant",
         keyframes {
             durationMillis = 5000
             0.0f at 0 with LinearOutSlowInEasing // for 0-15 ms
@@ -26,7 +26,7 @@ enum class AnimationSpecEnum(
         -1.2f, 1.2f, 5000);
 
     override fun toString(): String {
-        return descriptor
+        return "$descriptor ($lowerBound, $upperBound, ${duration}ms)"
     }
 
     companion object {
