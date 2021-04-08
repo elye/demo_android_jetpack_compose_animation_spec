@@ -4,6 +4,7 @@ import androidx.compose.animation.core.*
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
@@ -13,26 +14,29 @@ import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
 import androidx.compose.ui.graphics.nativeCanvas
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.jetpackcomposeanimationspec.AnimationSpecEnum
 import kotlin.math.ceil
 import kotlin.math.floor
 
 @Composable
-fun OverallPlotter(modifier: Modifier = Modifier, animationSpec: AnimationSpec<Float>) {
+fun OverallPlotter(modifier: Modifier = Modifier, animationSpecEnum: AnimationSpecEnum) {
 
-    val animatableFloat = remember(animationSpec) { Animatable(0f) }
-    val trackAnimatableFloat = remember(animationSpec) { Animatable(0f) }
+    val animatableFloat = remember(animationSpecEnum) { Animatable(0f) }
+    val trackAnimatableFloat = remember(animationSpecEnum) { Animatable(0f) }
 
     LaunchedEffect(animatableFloat) {
         animatableFloat.animateTo(
             1f,
-            animationSpec = tween(durationMillis = 20000, easing = LinearEasing)
+            animationSpec = tween(durationMillis = animationSpecEnum.duration, easing = LinearEasing)
         )
     }
 
-    val upperBound = 2f
-    val lowerBound = -1f
+    val upperBound = animationSpecEnum.upperBound
+    val lowerBound = animationSpecEnum.lowerBound
 
     val lowerBoundCeil = ceil(lowerBound).toInt()
     val upperBoundFloor = floor(upperBound).toInt()
@@ -40,16 +44,16 @@ fun OverallPlotter(modifier: Modifier = Modifier, animationSpec: AnimationSpec<F
     LaunchedEffect(trackAnimatableFloat) {
         trackAnimatableFloat.animateTo(
             1f,
-            animationSpec = animationSpec
+            animationSpec = animationSpecEnum.animationSpec
         )
     }
 
     Row(modifier.padding(16.dp)) {
         val penColor = MaterialTheme.colors.onBackground
-        val boxPadding = 16.dp
+        val boxPadding = 24.dp
         Box(
             modifier = Modifier
-                .padding(0.dp, boxPadding, 0.dp, boxPadding)
+                .padding(0.dp, 0.dp, 0.dp, boxPadding)
                 .width(30.dp)
                 .fillMaxHeight()
         ) {
@@ -62,62 +66,113 @@ fun OverallPlotter(modifier: Modifier = Modifier, animationSpec: AnimationSpec<F
         }
         Box(
             Modifier
-                .padding(0.dp, boxPadding, 0.dp, boxPadding)
+                .padding(0.dp, 0.dp, 0.dp, boxPadding)
                 .width(30.dp)
                 .fillMaxHeight()
         ) {
-            Canvas(
+            Yaxis(lowerBoundCeil, upperBoundFloor, lowerBound, upperBound)
+        }
+        Column(
+            Modifier
+                .padding(0.dp, 0.dp, 0.dp, 0.dp)
+                .weight(4f)
+                .fillMaxHeight()) {
+            Box(
                 Modifier
-                    .fillMaxSize()
+                    .fillMaxWidth()
+                    .weight(1f)
             ) {
-                val textSize = 16.sp.toPx()
-                val textPaint = Paint().asFrameworkPaint().apply {
-                    this.textSize = textSize
-                }
-                drawIntoCanvas { canvas ->
-                    (lowerBoundCeil..upperBoundFloor).forEach {
-                        canvas.nativeCanvas.drawText(
-                            it.toString(),
-                            15.dp.toPx(),
-                            size.height + textSize / 2
-                                    - ((size.height))
-                                    * (it - lowerBound) / (upperBound - lowerBound),
-                            textPaint
-                        )
-                    }
-                }
+                PlotterView(
+                    penColor,
+                    lowerBoundCeil,
+                    upperBoundFloor,
+                    lowerBound,
+                    upperBound,
+                    animatableFloat,
+                    trackAnimatableFloat,
+                    animationSpecEnum
+                )
+            }
+            Xaxis(boxPadding, animationSpecEnum)
+        }
+    }
+}
+
+@Composable
+private fun Yaxis(
+    lowerBoundCeil: Int,
+    upperBoundFloor: Int,
+    lowerBound: Float,
+    upperBound: Float
+) {
+    Canvas(
+        Modifier
+            .fillMaxSize()
+    ) {
+        val textSize = 16.sp.toPx()
+        val textPaint = Paint().asFrameworkPaint().apply {
+            this.textSize = textSize
+        }
+        drawIntoCanvas { canvas ->
+            (lowerBoundCeil..upperBoundFloor).forEach {
+                canvas.nativeCanvas.drawText(
+                    it.toString(),
+                    15.dp.toPx(),
+                    size.height + textSize / 2
+                            - ((size.height))
+                            * (it - lowerBound) / (upperBound - lowerBound),
+                    textPaint
+                )
             }
         }
-        Box(
-            Modifier
-                .padding(0.dp, boxPadding, 0.dp, boxPadding)
-                .weight(4f)
-                .fillMaxHeight()
-        ) {
-            Canvas(Modifier.fillMaxSize()) {
-                drawRect(penColor, size = size, style = Stroke(1.dp.toPx()))
+    }
+}
 
-                (lowerBoundCeil..upperBoundFloor).forEach {
-                    val yAxis = size.height -
-                            ((size.height)) * (it - lowerBound) / (upperBound - lowerBound)
-                    drawLine(
-                        penColor,
-                        Offset(0f, yAxis),
-                        Offset(size.width, yAxis),
-                        1.dp.toPx()
-                    )
-                }
-            }
-            PlotterView(
-                Modifier.fillMaxSize(),
-                xPoint = animatableFloat.value,
-                yPoint = trackAnimatableFloat.value,
-                upperBound = upperBound,
-                lowerBound = lowerBound,
-                animationSpec = animationSpec
+@Composable
+private fun Xaxis(
+    boxPadding: Dp,
+    animationSpecEnum: AnimationSpecEnum
+) {
+    Row(
+        Modifier
+            .fillMaxWidth()
+            .height(boxPadding)) {
+        Text("${animationSpecEnum.duration} ms", Modifier.fillMaxWidth(), textAlign = TextAlign.End)
+    }
+}
+
+@Composable
+private fun PlotterView(
+    penColor: Color,
+    lowerBoundCeil: Int,
+    upperBoundFloor: Int,
+    lowerBound: Float,
+    upperBound: Float,
+    animatableFloat: Animatable<Float, AnimationVector1D>,
+    trackAnimatableFloat: Animatable<Float, AnimationVector1D>,
+    animationSpecEnum: AnimationSpecEnum
+) {
+    Canvas(Modifier.fillMaxSize()) {
+        drawRect(penColor, size = size, style = Stroke(1.dp.toPx()))
+        (lowerBoundCeil..upperBoundFloor).forEach {
+            val yAxis = size.height -
+                    ((size.height)) * (it - lowerBound) / (upperBound - lowerBound)
+            drawLine(
+                penColor,
+                Offset(0f, yAxis),
+                Offset(size.width, yAxis),
+                1.dp.toPx()
             )
         }
     }
+    RawPlotterView(
+        Modifier.fillMaxSize(),
+        xPoint = animatableFloat.value,
+        yPoint = trackAnimatableFloat.value,
+        upperBound = upperBound,
+        lowerBound = lowerBound,
+        animationSpecEnum = animationSpecEnum
+    )
 }
 
 @Composable
@@ -136,13 +191,13 @@ fun BallAnimator(
 }
 
 @Composable
-fun PlotterView(
+fun RawPlotterView(
     modifier: Modifier = Modifier,
     xPoint: Float, yPoint: Float,
     upperBound: Float, lowerBound: Float,
-    animationSpec: AnimationSpec<Float>
+    animationSpecEnum: AnimationSpecEnum
 ) {
-    val path by remember(animationSpec) { mutableStateOf(Path()) }
+    val path by remember(animationSpecEnum) { mutableStateOf(Path()) }
     val penColor = Color.Red
 
     Canvas(modifier) {
