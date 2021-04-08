@@ -18,7 +18,8 @@ fun OverallSelector(selectedAnimationSpec: MutableState<AnimationSpecEnum>) {
     Row(
         Modifier
             .fillMaxWidth()
-            .height(36.dp)) {
+            .height(36.dp)
+    ) {
         Spacer(Modifier.width(16.dp))
         Text("Select AnimationSpec:")
         Spacer(Modifier.width(16.dp))
@@ -32,25 +33,32 @@ fun OverallSelector(selectedAnimationSpec: MutableState<AnimationSpecEnum>) {
 }
 
 @Composable
-fun <T>DropdownDemo(modifier: Modifier, items: List<T>, selected: MutableState<T>) {
+fun <T> DropdownDemo(modifier: Modifier, items: List<T>, selected: MutableState<T>) {
     var expanded by remember { mutableStateOf(false) }
-    Box(modifier = modifier.wrapContentSize(Alignment.TopStart)) {
-        Text(selected.value.toString(),
-            modifier = Modifier.fillMaxWidth().clickable(
-                onClick = { expanded = true }).background(
-                Color.Gray))
+    Box(modifier = modifier.fillMaxWidth()) {
+        Text(
+            selected.value.toString(),
+            modifier = Modifier
+                .background(Color.LightGray)
+                .fillMaxWidth()
+                .clickable(
+                    onClick = { expanded = true })
+                .padding(16.dp, 0.dp)
+        )
         DropdownMenu(
             expanded = expanded,
             onDismissRequest = { expanded = false },
-            modifier = Modifier.fillMaxWidth().background(
-                Color.Red)
+            modifier = Modifier.fillMaxWidth(),
         ) {
             items.forEachIndexed { index, select ->
-                DropdownMenuItem(onClick = {
-                    selected.value = items[index]
-                    expanded = false
-                }) {
-                    Text(text = select.toString())
+                DropdownMenuItem(
+                    onClick = {
+                        selected.value = items[index]
+                        expanded = false
+                    },
+                    modifier = Modifier.fillMaxWidth(),
+                ) {
+                    Text(text = select.toString(), modifier = Modifier.fillMaxWidth())
                 }
             }
         }

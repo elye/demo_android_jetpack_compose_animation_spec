@@ -20,14 +20,11 @@ import com.example.jetpackcomposeanimationspec.ui.views.OverallSelector
 
 class MainActivity : ComponentActivity() {
 
-    private val selectedAnimationSpec = mutableStateOf(AnimationSpecEnum.SPRING)
-
+    private val selectedAnimationSpec = mutableStateOf(AnimationSpecEnum.TWEEN)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
             JetpackComposeAnimationSpecTheme {
-                val animationSpec = spring<Float>(0.125f, 5f)
-
                 Surface(color = MaterialTheme.colors.background) {
                     Column {
                         Spacer(Modifier.height(16.dp))
