@@ -1,6 +1,11 @@
 package com.example.jetpackcomposeanimationspec
 
+import android.animation.TimeInterpolator
+import android.view.animation.AnticipateOvershootInterpolator
+import android.view.animation.BounceInterpolator
+import android.view.animation.Interpolator
 import androidx.compose.animation.core.*
+import kotlin.math.sin
 
 private val HesitateEasing = CubicBezierEasing(0f, 1f, 1f, 0f)
 
@@ -40,6 +45,21 @@ enum class AnimationSpecEnum(
         "Tween 1000 0 HesitateEasing",
         FloatTweenSpec(1000, 0, HesitateEasing),
         0f, 1f, 1000
+    ),
+    TWEEN_7(
+        "Tween AnticipateOvershootInterpolator",
+        FloatTweenSpec(1000, 0,  AnticipateOvershootInterpolator().toEasing()),
+        -0.2f, 1.2f, 1000
+    ),
+    TWEEN_8(
+        "Tween BouncingInterpolator",
+        FloatTweenSpec(2000, 0,  BounceInterpolator().toEasing()),
+        0f, 1f, 2000
+    ),
+    TWEEN_9(
+        "Tween 50 CircularSpring",
+        FloatTweenSpec(7000, 0, CircularSpringInterpolatorEasing()),
+        -1f, 1f, 7000
     ),
     SPRING(
         "Spring 0.25 20",
@@ -127,5 +147,16 @@ enum class AnimationSpecEnum(
         fun getEnum(value: String): AnimationSpecEnum {
             return values().first { it.descriptor == value }
         }
+    }
+}
+
+internal fun CircularSpringInterpolatorEasing(tension: Float = 50f): Easing =
+    CircularSpringInterpolator(tension).toEasing()
+
+fun TimeInterpolator.toEasing() = Easing { x -> getInterpolation(x) }
+
+class CircularSpringInterpolator(private val tension: Float = 50f) : Interpolator {
+    override fun getInterpolation(input: Float): Float {
+        return (sin(tension * input) * sin(Math.PI * input)).toFloat()
     }
 }
