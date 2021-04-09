@@ -42,8 +42,7 @@ fun OverallPlotter(modifier: Modifier = Modifier, animationSpecEnum: AnimationSp
     val upperBoundFloor = floor(upperBound).toInt()
 
     LaunchedEffect(trackAnimatableFloat) {
-        trackAnimatableFloat.animateTo(
-            1f,
+        trackAnimatableFloat.animateTo(1f,
             animationSpec = animationSpecEnum.animationSpec
         )
     }

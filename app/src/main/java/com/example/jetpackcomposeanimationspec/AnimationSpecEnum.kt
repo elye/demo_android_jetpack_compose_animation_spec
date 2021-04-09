@@ -69,8 +69,18 @@ enum class AnimationSpecEnum(
     SPRING_6(
         "Spring 0.01 3000",
         FloatSpringSpec(0.01f, 3000f),
-        0f, 2f, 10000
-    ),    KEYFRAME_1(
+        0f, 2f, 10000),
+    REPEATABLE_1("Repeat 2 Tween Restart",
+        repeatable(2,
+            tween<Float>(500, 0, FastOutSlowInEasing),
+            RepeatMode.Restart),
+        0f, 1f, 1000),
+    REPEATABLE_2("Repeat 3 Tween Reverse",
+        repeatable(3,
+            tween<Float>(500, 0, FastOutSlowInEasing),
+            RepeatMode.Reverse),
+        0f, 1f, 1500),
+    KEYFRAME_1(
         "Keyframe Without Easing",
         keyframes {
             durationMillis = 5000
@@ -106,8 +116,8 @@ enum class AnimationSpecEnum(
         },
         -1.2f, 1.2f, 5000
     ),
-    SNAP_1("Snap 500", snap(500), 0f, 1f, 1000);
-
+    SNAP_1("Snap 500",
+        snap(500), 0f, 1f, 1000);
 
     override fun toString(): String {
         return "$descriptor ($lowerBound, $upperBound, ${duration}ms)"
