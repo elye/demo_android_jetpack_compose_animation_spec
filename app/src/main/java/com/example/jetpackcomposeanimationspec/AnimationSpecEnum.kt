@@ -13,60 +13,64 @@ enum class AnimationSpecEnum(
 ) {
     TWEEN(
         "Tween 1000 0 LinearEasing",
-        tween(1000, 0, LinearEasing),
+        FloatTweenSpec(1000, 0, LinearEasing),
         0f, 1f, 1000
     ),
     TWEEN_2(
         "Tween 500 250 LinearEasing",
-        tween(500, 250, LinearEasing),
+        FloatTweenSpec(500, 250, LinearEasing),
         0f, 1f, 1000
     ),
     TWEEN_3(
         "Tween 1000 0 LinearOutSlowInEasing",
-        tween(1000, 0, LinearOutSlowInEasing),
+        FloatTweenSpec(1000, 0, LinearOutSlowInEasing),
         0f, 1f, 1000
     ),
     TWEEN_4(
         "Tween 1000 0 FastOutSlowInEasing",
-        tween(1000, 0, FastOutSlowInEasing),
+        FloatTweenSpec(1000, 0, FastOutSlowInEasing),
         0f, 1f, 1000
     ),
     TWEEN_5(
         "Tween 1000 0 FastOutLinearInEasing",
-        tween(1000, 0, FastOutLinearInEasing),
+        FloatTweenSpec(1000, 0, FastOutLinearInEasing),
         0f, 1f, 1000
     ),
     TWEEN_6(
         "Tween 1000 0 HesitateEasing",
-        tween(1000, 0, HesitateEasing),
+        FloatTweenSpec(1000, 0, HesitateEasing),
         0f, 1f, 1000
     ),
     SPRING(
         "Spring 0.25 20",
-        spring<Float>(0.25f, 20f),
+        FloatSpringSpec(0.25f, 20f),
         0f, 2f, 5000
     ),
     SPRING_2(
         "Spring 0.25 40",
-        spring<Float>(0.25f, 40f),
+        FloatSpringSpec(0.25f, 40f),
         0f, 2f, 5000
     ),
     SPRING_3(
         "Spring 0.5 40",
-        spring<Float>(0.5f, 40f),
+        FloatSpringSpec(0.5f, 40f),
         0f, 2f, 5000
     ),
     SPRING_4(
         "Spring 1 40",
-        spring<Float>(1f, 40f),
+        FloatSpringSpec(1f, 40f),
         0f, 2f, 5000
     ),
     SPRING_5(
         "Spring 0.1 100",
-        spring<Float>(0.1f, 100f),
+        FloatSpringSpec(0.1f, 100f),
         0f, 2f, 5000
     ),
-    KEYFRAME_1(
+    SPRING_6(
+        "Spring 0.01 3000",
+        FloatSpringSpec(0.01f, 3000f),
+        0f, 2f, 10000
+    ),    KEYFRAME_1(
         "Keyframe Without Easing",
         keyframes {
             durationMillis = 5000
