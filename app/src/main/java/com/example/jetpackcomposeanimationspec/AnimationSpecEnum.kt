@@ -59,7 +59,7 @@ enum class AnimationSpecEnum(
     TWEEN_9(
         "Tween 50 CircularSpring",
         FloatTweenSpec(7000, 0, CircularSpringInterpolatorEasing()),
-        -1f, 1f, 7000
+        -1f, 2f, 7000
     ),
     SPRING(
         "Spring 0.25 20",
@@ -157,6 +157,6 @@ fun TimeInterpolator.toEasing() = Easing { x -> getInterpolation(x) }
 
 class CircularSpringInterpolator(private val tension: Float = 50f) : Interpolator {
     override fun getInterpolation(input: Float): Float {
-        return (sin(tension * input) * sin(Math.PI * input)).toFloat()
+        return (sin(tension * input) * sin(Math.PI * input) + input).toFloat()
     }
 }
