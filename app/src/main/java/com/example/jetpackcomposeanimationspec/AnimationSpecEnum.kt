@@ -5,6 +5,7 @@ import android.view.animation.AnticipateOvershootInterpolator
 import android.view.animation.BounceInterpolator
 import android.view.animation.Interpolator
 import androidx.compose.animation.core.*
+import com.example.jetpackcomposeanimationspec.math.noise1D
 import kotlin.math.sin
 
 private val HesitateEasing = CubicBezierEasing(0f, 1f, 1f, 0f)
@@ -60,6 +61,11 @@ enum class AnimationSpecEnum(
         "Tween 50 CircularSpring",
         FloatTweenSpec(7000, 0, CircularSpringInterpolatorEasing()),
         -1f, 2f, 7000
+    ),
+    TWEEN_10(
+        "Tween 200 PerlinNoise",
+        FloatTweenSpec(2000, 0, PerlinNoiseInterpolator(200.0).toEasing()),
+        0f, 1.2f, 2000
     ),
     SPRING(
         "Spring 0.25 20",
@@ -160,3 +166,16 @@ class CircularSpringInterpolator(private val tension: Float = 50f) : Interpolato
         return (sin(tension * input) * sin(Math.PI * input) + input).toFloat()
     }
 }
+
+class PerlinNoiseInterpolator(
+    private val seed: Double,
+    private val cycle: Int = 2,
+    private val length: Int = 2,
+    private val noiseWeight: Int = 2
+) : Interpolator {
+    override fun getInterpolation(input: Float): Float {
+        val noiseStrength = (if (input < 0.5) input else (1f - input)) * noiseWeight
+        return (noise1D((seed + input.toDouble()) * cycle)).toFloat() * length * noiseStrength + input
+    }
+}
+
