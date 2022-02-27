@@ -169,13 +169,12 @@ class CircularSpringInterpolator(private val tension: Float = 50f) : Interpolato
 
 class PerlinNoiseInterpolator(
     private val seed: Double,
-    private val cycle: Int = 2,
-    private val length: Int = 2,
-    private val noiseWeight: Int = 2
+    private val cycle: Float = 2f,
+    private val length: Float = 4f
 ) : Interpolator {
     override fun getInterpolation(input: Float): Float {
-        val noiseStrength = (if (input < 0.5) input else (1f - input)) * noiseWeight
-        return (noise1D((seed + input.toDouble()) * cycle)).toFloat() * length * noiseStrength + input
+        val noiseStrength = (if (input < 0.5) input else (1f - input)) * length
+        return (noise1D((seed + input.toDouble()) * cycle)).toFloat() * noiseStrength + input
     }
 }
 
